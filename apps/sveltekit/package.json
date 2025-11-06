@@ -10,7 +10,7 @@
 		"prepare": "svelte-kit sync || echo ''",
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "echo 'Linting not configured yet'",
+		"lint": "eslint .",
 		"type-check": "svelte-check --tsconfig ./tsconfig.json",
 		"clean": "rm -rf .svelte-kit build"
 	},

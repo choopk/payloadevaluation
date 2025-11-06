@@ -55,3 +55,6 @@ vite.config.ts.timestamp-*
 *.local
 count.txt
 todos.json
+
+# Turborepo
+.turbo

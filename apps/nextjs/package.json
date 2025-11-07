@@ -15,9 +15,11 @@
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.62.1",
+    "@payloadcms/live-preview-react": "^3.62.1",
     "@payloadcms/next": "^3.62.1",
     "@payloadcms/richtext-lexical": "^3.62.1",
     "graphql": "^16.12.0",
+    "jsonwebtoken": "^9.0.2",
     "next": "16.0.1",
     "payload": "^3.62.1",
     "react": "19.2.0",
@@ -26,14 +28,15 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",
+    "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "babel-plugin-react-compiler": "^1.0.0",
+    "cross-env": "^10",
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",
-    "typescript": "^5",
-    "cross-env": "^10"
+    "typescript": "^5"
   }
 }

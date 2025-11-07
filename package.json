@@ -5,6 +5,9 @@
   "scripts": {
     "build": "turbo run build",
     "dev": "turbo run dev",
+    "dev:nextjs": "turbo run dev --filter=@repo/nextjs",
+    "dev:svelte": "turbo run dev --filter=@repo/sveltekit",
+    "dev:tanstack": "turbo run dev --filter=@repo/tanstack-start",
     "lint": "turbo run lint",
     "format": "prettier --write \"**/*.{ts,tsx,md,json}\"",
     "clean": "turbo run clean"

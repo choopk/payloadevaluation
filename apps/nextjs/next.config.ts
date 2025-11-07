@@ -1,7 +1,16 @@
 import type { NextConfig } from "next";
+import { withPayload } from '@payloadcms/next/withPayload'
+import path from 'path'
 
 const nextConfig: NextConfig = {
-  /* config options here */
+  reactCompiler: true,
+  experimental: {
+    turbopackFileSystemCacheForDev: true,
+  },
+  turbopack: {
+    root: path.join(__dirname, '../../')
+  },
+  serverExternalPackages: ['@payloadcms/db-postgres']
 };
 
-export default nextConfig;
+export default withPayload(nextConfig);

@@ -13,6 +13,7 @@
     "isolatedModules": true,
     "jsx": "react-jsx",
     "incremental": true,
+    "allowImportingTsExtensions": true,
     "forceConsistentCasingInFileNames": true,
     "declaration": true,
     "plugins": [
@@ -22,7 +23,7 @@
     ],
     "paths": {
       "@/*": ["./*"],
-      "@payload-config": ["./payload.config.ts"]
+      "@payload-config": ["./payload.config.mts"]
     }
   },
   "include": [

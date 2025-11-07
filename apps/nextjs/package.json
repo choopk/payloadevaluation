@@ -1,11 +1,13 @@
 {
   "name": "@repo/nextjs",
   "version": "0.1.0",
+  "type": "module",
   "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "build:nextjs": "next build",
+    "payload": "cross-env PAYLOAD_CONFIG_PATH=payload.config.mts payload",
     "start": "next start",
     "lint": "eslint",
     "type-check": "tsc --noEmit",
@@ -31,6 +33,7 @@
     "eslint": "^9",
     "eslint-config-next": "16.0.1",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "cross-env": "^10"
   }
 }

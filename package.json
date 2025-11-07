@@ -4,6 +4,7 @@
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "build:nextjs": "turbo run build --filter=@repo/nextjs",
     "dev": "turbo run dev",
     "dev:nextjs": "turbo run dev --filter=@repo/nextjs",
     "dev:svelte": "turbo run dev --filter=@repo/sveltekit",

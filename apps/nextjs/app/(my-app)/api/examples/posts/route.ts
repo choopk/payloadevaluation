@@ -1,28 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getPayloadClient } from '@/lib/payload/client'
-import { findWithPagination, findWhere, countDocuments } from '@/lib/payload/operations'
+import { findWithPagination } from '@/lib/payload/operations'
 
 /**
- * GET /api/examples/products
+ * GET /api/examples/posts
  *
- * Demonstrates various ways to query products using the Payload Local API
+ * Demonstrates various ways to query blog posts using the Payload Local API
  *
  * Query Parameters:
  * - page: Page number for pagination (default: 1)
  * - limit: Items per page (default: 10)
  * - category: Filter by category
- * - inStock: Filter by stock status (true/false)
+ * - status: Filter by status (draft/published)
  * - featured: Filter by featured status (true/false)
- * - minPrice: Minimum price filter
- * - maxPrice: Maximum price filter
- * - search: Search term for name/description
+ * - author: Filter by author name
+ * - tag: Filter by tag
+ * - search: Search term for title/excerpt/content
  *
  * Examples:
- * - /api/examples/products
- * - /api/examples/products?category=electronics
- * - /api/examples/products?inStock=true&featured=true
- * - /api/examples/products?minPrice=10&maxPrice=100
- * - /api/examples/products?search=laptop
+ * - /api/examples/posts
+ * - /api/examples/posts?category=technology
+ * - /api/examples/posts?status=published&featured=true
+ * - /api/examples/posts?author=John Doe
+ * - /api/examples/posts?search=nextjs
  */
 export async function GET(request: NextRequest) {
   try {
@@ -30,15 +30,15 @@ export async function GET(request: NextRequest) {
     const page = parseInt(searchParams.get('page') || '1')
     const limit = parseInt(searchParams.get('limit') || '10')
     const category = searchParams.get('category')
-    const inStock = searchParams.get('inStock')
+    const status = searchParams.get('status')
     const featured = searchParams.get('featured')
-    const minPrice = searchParams.get('minPrice')
-    const maxPrice = searchParams.get('maxPrice')
+    const author = searchParams.get('author')
+    const tag = searchParams.get('tag')
     const search = searchParams.get('search')
 
     // Example 1: Simple pagination
-    if (!category && !inStock && !featured && !minPrice && !maxPrice && !search) {
-      const result = await findWithPagination('products', page, limit)
+    if (!category && !status && !featured && !author && !tag && !search) {
+      const result = await findWithPagination('posts', page, limit)
       return NextResponse.json({
         success: true,
         method: 'Simple Pagination',
@@ -60,39 +60,41 @@ export async function GET(request: NextRequest) {
       whereConditions.push({ category: { equals: category } })
     }
 
-    if (inStock !== null && inStock !== undefined) {
-      whereConditions.push({ inStock: { equals: inStock === 'true' } })
+    if (status) {
+      whereConditions.push({ status: { equals: status } })
     }
 
     if (featured !== null && featured !== undefined) {
       whereConditions.push({ featured: { equals: featured === 'true' } })
     }
 
-    if (minPrice || maxPrice) {
-      const priceCondition: any = {}
-      if (minPrice) priceCondition.greater_than_equal = parseFloat(minPrice)
-      if (maxPrice) priceCondition.less_than_equal = parseFloat(maxPrice)
-      whereConditions.push({ price: priceCondition })
+    if (author) {
+      whereConditions.push({ author: { contains: author } })
+    }
+
+    if (tag) {
+      whereConditions.push({ 'tags.tag': { equals: tag } })
     }
 
     if (search) {
       // For search, we use OR conditions
       const result = await payload.find({
-        collection: 'products',
+        collection: 'posts',
         where: {
           and: [
             ...whereConditions,
             {
               or: [
-                { name: { contains: search } },
-                { description: { contains: search } },
+                { title: { contains: search } },
+                { excerpt: { contains: search } },
+                { content: { contains: search } },
               ],
             },
           ],
         },
         page,
         limit,
-        sort: '-createdAt',
+        sort: '-publishedDate',
       })
 
       return NextResponse.json({
@@ -107,10 +109,10 @@ export async function GET(request: NextRequest) {
         },
         filters: {
           category,
-          inStock,
+          status,
           featured,
-          minPrice,
-          maxPrice,
+          author,
+          tag,
           search,
         },
       })
@@ -118,13 +120,13 @@ export async function GET(request: NextRequest) {
 
     // Example 3: Complex AND query
     const result = await payload.find({
-      collection: 'products',
+      collection: 'posts',
       where: {
         and: whereConditions,
       },
       page,
       limit,
-      sort: '-createdAt',
+      sort: '-publishedDate',
     })
 
     return NextResponse.json({
@@ -139,18 +141,18 @@ export async function GET(request: NextRequest) {
       },
       filters: {
         category,
-        inStock,
+        status,
         featured,
-        minPrice,
-        maxPrice,
+        author,
+        tag,
       },
     })
   } catch (error: any) {
-    console.error('Error fetching products:', error)
+    console.error('Error fetching posts:', error)
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to fetch products',
+        error: error.message || 'Failed to fetch posts',
       },
       { status: 500 }
     )
@@ -158,19 +160,20 @@ export async function GET(request: NextRequest) {
 }
 
 /**
- * POST /api/examples/products
+ * POST /api/examples/posts
  *
- * Creates a new product using the Payload Local API
+ * Creates a new blog post using the Payload Local API
  *
  * Example body:
  * {
- *   "name": "Awesome Product",
- *   "slug": "awesome-product",
- *   "description": "This is an awesome product",
- *   "price": 99.99,
- *   "category": "electronics",
- *   "inStock": true,
- *   "inventory": 50
+ *   "title": "Getting Started with Next.js",
+ *   "slug": "getting-started-with-nextjs",
+ *   "content": "This is the post content...",
+ *   "excerpt": "Learn the basics of Next.js",
+ *   "author": "John Doe",
+ *   "category": "technology",
+ *   "status": "published",
+ *   "publishedDate": "2025-01-01"
  * }
  */
 export async function POST(request: NextRequest) {
@@ -178,11 +181,11 @@ export async function POST(request: NextRequest) {
     const body = await request.json()
 
     // Validate required fields
-    if (!body.name || !body.slug || !body.price || !body.category) {
+    if (!body.title || !body.slug || !body.content || !body.excerpt || !body.author || !body.category) {
       return NextResponse.json(
         {
           success: false,
-          error: 'Missing required fields: name, slug, price, category',
+          error: 'Missing required fields: title, slug, content, excerpt, author, category',
         },
         { status: 400 }
       )
@@ -190,23 +193,23 @@ export async function POST(request: NextRequest) {
 
     const payload = await getPayloadClient()
 
-    // Example: Create a new product
-    const product = await payload.create({
-      collection: 'products',
+    // Example: Create a new post
+    const post = await payload.create({
+      collection: 'posts',
       data: body,
     })
 
     return NextResponse.json({
       success: true,
       method: 'Create Document',
-      data: product,
+      data: post,
     })
   } catch (error: any) {
-    console.error('Error creating product:', error)
+    console.error('Error creating post:', error)
     return NextResponse.json(
       {
         success: false,
-        error: error.message || 'Failed to create product',
+        error: error.message || 'Failed to create post',
       },
       { status: 500 }
     )

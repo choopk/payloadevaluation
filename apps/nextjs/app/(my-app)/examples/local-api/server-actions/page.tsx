@@ -10,12 +10,12 @@ import Link from 'next/link'
  * operations from client components.
  */
 export default async function ServerActionsPage() {
-  // Fetch products server-side
+  // Fetch posts server-side
   const payload = await getPayloadClient()
-  const products = await payload.find({
-    collection: 'products',
+  const posts = await payload.find({
+    collection: 'posts',
     limit: 100,
-    sort: '-createdAt',
+    sort: '-publishedDate',
   })
 
   return (
@@ -30,7 +30,7 @@ export default async function ServerActionsPage() {
         <h1 className="text-4xl font-bold mb-4">Server Actions Example</h1>
         <p className="text-gray-600">
           This page demonstrates how to use Payload Local API with Next.js Server Actions
-          for CRUD operations. All mutations are performed server-side with automatic
+          for CRUD operations on blog posts. All mutations are performed server-side with automatic
           revalidation.
         </p>
       </div>
@@ -53,24 +53,24 @@ export default async function ServerActionsPage() {
 import { getPayloadClient } from '@/lib/payload/client'
 import { revalidatePath } from 'next/cache'
 
-export async function createProduct(formData) {
+export async function createPost(formData) {
   const payload = await getPayloadClient()
 
-  const product = await payload.create({
-    collection: 'products',
+  const post = await payload.create({
+    collection: 'posts',
     data: formData,
   })
 
   // Automatically revalidate affected pages
   revalidatePath('/examples/local-api')
 
-  return { success: true, data: product }
+  return { success: true, data: post }
 }`}</code>
         </div>
       </section>
 
       {/* Interactive Demo */}
-      <ServerActionsDemo initialProducts={products.docs} />
+      <ServerActionsDemo initialPosts={posts.docs} />
     </div>
   )
 }

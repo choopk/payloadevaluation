@@ -1,5 +1,5 @@
 import { getPayloadClient } from '@/lib/payload/client'
-import { findWhere, findBySlug, countDocuments } from '@/lib/payload/operations'
+import { findWhere, countDocuments } from '@/lib/payload/operations'
 import Link from 'next/link'
 
 /**
@@ -10,41 +10,43 @@ import Link from 'next/link'
  * providing optimal performance and SEO.
  */
 export default async function LocalAPIExamplesPage() {
-  // Example 1: Get all products
+  // Example 1: Get all posts
   const payload = await getPayloadClient()
-  const allProducts = await payload.find({
-    collection: 'products',
+  const allPosts = await payload.find({
+    collection: 'posts',
     limit: 10,
-    sort: '-createdAt',
+    sort: '-publishedDate',
   })
 
-  // Example 2: Get featured products using helper
-  const featuredProducts = await findWhere('products', {
+  // Example 2: Get featured posts using helper
+  const featuredPosts = await findWhere('posts', {
     featured: { equals: true },
   })
 
-  // Example 3: Get products by category
-  const electronicsProducts = await findWhere('products', {
-    category: { equals: 'electronics' },
+  // Example 3: Get published posts by category
+  const technologyPosts = await findWhere('posts', {
+    and: [
+      { category: { equals: 'technology' } },
+      { status: { equals: 'published' } },
+    ],
   })
 
-  // Example 4: Count total products
-  const totalProducts = await countDocuments('products')
+  // Example 4: Count total posts
+  const totalPosts = await countDocuments('posts')
 
-  // Example 5: Count products in stock
-  const inStockCount = await countDocuments('products', {
-    inStock: { equals: true },
+  // Example 5: Count published posts
+  const publishedCount = await countDocuments('posts', {
+    status: { equals: 'published' },
   })
 
-  // Example 6: Complex query - featured electronics under $100
-  const affordableFeaturedElectronics = await payload.find({
-    collection: 'products',
+  // Example 6: Complex query - featured technology posts
+  const featuredTechPosts = await payload.find({
+    collection: 'posts',
     where: {
       and: [
-        { category: { equals: 'electronics' } },
+        { category: { equals: 'technology' } },
         { featured: { equals: true } },
-        { price: { less_than: 100 } },
-        { inStock: { equals: true } },
+        { status: { equals: 'published' } },
       ],
     },
   })
@@ -60,80 +62,83 @@ export default async function LocalAPIExamplesPage() {
         </p>
       </div>
 
-      {/* Example 1: All Products */}
+      {/* Example 1: All Posts */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">
-          Example 1: All Products (Latest 10)
+          Example 1: All Posts (Latest 10)
         </h2>
         <div className="bg-gray-50 p-4 rounded mb-4">
           <code className="text-sm">
-            {`const allProducts = await payload.find({
-  collection: 'products',
+            {`const allPosts = await payload.find({
+  collection: 'posts',
   limit: 10,
-  sort: '-createdAt',
+  sort: '-publishedDate',
 })`}
           </code>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {allProducts.docs.length > 0 ? (
-            allProducts.docs.map((product: any) => (
-              <ProductCard key={product.id} product={product} />
+          {allPosts.docs.length > 0 ? (
+            allPosts.docs.map((post: any) => (
+              <PostCard key={post.id} post={post} />
             ))
           ) : (
             <p className="text-gray-500 col-span-full">
-              No products found. Create some products in the admin panel to see them here.
+              No posts found. Create some posts in the admin panel to see them here.
             </p>
           )}
         </div>
         <div className="mt-4 text-sm text-gray-600">
-          Total: {allProducts.totalDocs} products | Page {allProducts.page} of{' '}
-          {allProducts.totalPages}
+          Total: {allPosts.totalDocs} posts | Page {allPosts.page} of{' '}
+          {allPosts.totalPages}
         </div>
       </section>
 
-      {/* Example 2: Featured Products */}
+      {/* Example 2: Featured Posts */}
       <section className="mb-12">
-        <h2 className="text-2xl font-bold mb-4">Example 2: Featured Products</h2>
+        <h2 className="text-2xl font-bold mb-4">Example 2: Featured Posts</h2>
         <div className="bg-gray-50 p-4 rounded mb-4">
           <code className="text-sm">
-            {`const featuredProducts = await findWhere('products', {
+            {`const featuredPosts = await findWhere('posts', {
   featured: { equals: true },
 })`}
           </code>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {featuredProducts.length > 0 ? (
-            featuredProducts.map((product: any) => (
-              <ProductCard key={product.id} product={product} featured />
+          {featuredPosts.length > 0 ? (
+            featuredPosts.map((post: any) => (
+              <PostCard key={post.id} post={post} featured />
             ))
           ) : (
             <p className="text-gray-500 col-span-full">
-              No featured products found.
+              No featured posts found.
             </p>
           )}
         </div>
       </section>
 
-      {/* Example 3: Products by Category */}
+      {/* Example 3: Posts by Category */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">
-          Example 3: Electronics Category
+          Example 3: Technology Category (Published)
         </h2>
         <div className="bg-gray-50 p-4 rounded mb-4">
           <code className="text-sm">
-            {`const electronicsProducts = await findWhere('products', {
-  category: { equals: 'electronics' },
+            {`const technologyPosts = await findWhere('posts', {
+  and: [
+    { category: { equals: 'technology' } },
+    { status: { equals: 'published' } },
+  ],
 })`}
           </code>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {electronicsProducts.length > 0 ? (
-            electronicsProducts.map((product: any) => (
-              <ProductCard key={product.id} product={product} />
+          {technologyPosts.length > 0 ? (
+            technologyPosts.map((post: any) => (
+              <PostCard key={post.id} post={post} />
             ))
           ) : (
             <p className="text-gray-500 col-span-full">
-              No electronics products found.
+              No technology posts found.
             </p>
           )}
         </div>
@@ -144,29 +149,29 @@ export default async function LocalAPIExamplesPage() {
         <h2 className="text-2xl font-bold mb-4">Example 4: Statistics</h2>
         <div className="bg-gray-50 p-4 rounded mb-4">
           <code className="text-sm">
-            {`const totalProducts = await countDocuments('products')
-const inStockCount = await countDocuments('products', {
-  inStock: { equals: true },
+            {`const totalPosts = await countDocuments('posts')
+const publishedCount = await countDocuments('posts', {
+  status: { equals: 'published' },
 })`}
           </code>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
           <StatCard
-            title="Total Products"
-            value={totalProducts}
-            icon="📦"
+            title="Total Posts"
+            value={totalPosts}
+            icon="📝"
           />
           <StatCard
-            title="In Stock"
-            value={inStockCount}
+            title="Published"
+            value={publishedCount}
             icon="✅"
             color="green"
           />
           <StatCard
-            title="Out of Stock"
-            value={totalProducts - inStockCount}
-            icon="❌"
-            color="red"
+            title="Drafts"
+            value={totalPosts - publishedCount}
+            icon="📄"
+            color="orange"
           />
         </div>
       </section>
@@ -174,31 +179,30 @@ const inStockCount = await countDocuments('products', {
       {/* Example 5: Complex Query */}
       <section className="mb-12">
         <h2 className="text-2xl font-bold mb-4">
-          Example 5: Complex Query (Featured Electronics Under $100)
+          Example 5: Complex Query (Featured Technology Posts)
         </h2>
         <div className="bg-gray-50 p-4 rounded mb-4 overflow-x-auto">
           <code className="text-sm whitespace-pre">
-            {`const products = await payload.find({
-  collection: 'products',
+            {`const posts = await payload.find({
+  collection: 'posts',
   where: {
     and: [
-      { category: { equals: 'electronics' } },
+      { category: { equals: 'technology' } },
       { featured: { equals: true } },
-      { price: { less_than: 100 } },
-      { inStock: { equals: true } },
+      { status: { equals: 'published' } },
     ],
   },
 })`}
           </code>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-          {affordableFeaturedElectronics.docs.length > 0 ? (
-            affordableFeaturedElectronics.docs.map((product: any) => (
-              <ProductCard key={product.id} product={product} />
+          {featuredTechPosts.docs.length > 0 ? (
+            featuredTechPosts.docs.map((post: any) => (
+              <PostCard key={post.id} post={post} />
             ))
           ) : (
             <p className="text-gray-500 col-span-full">
-              No products matching these criteria.
+              No posts matching these criteria.
             </p>
           )}
         </div>
@@ -215,11 +219,11 @@ const inStockCount = await countDocuments('products', {
             → Server Actions Example
           </Link>
           <Link
-            href="/api/examples/products"
+            href="/api/examples/posts"
             className="block text-blue-600 hover:underline"
             target="_blank"
           >
-            → API Routes Example (GET /api/examples/products)
+            → API Routes Example (GET /api/examples/posts)
           </Link>
           <a
             href="https://payloadcms.com/docs/local-api/overview"
@@ -235,8 +239,17 @@ const inStockCount = await countDocuments('products', {
   )
 }
 
-// Product Card Component
-function ProductCard({ product, featured }: { product: any; featured?: boolean }) {
+// Post Card Component
+function PostCard({ post, featured }: { post: any; featured?: boolean }) {
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'No date'
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
+  }
+
   return (
     <div className="border rounded-lg p-4 hover:shadow-lg transition-shadow">
       {featured && (
@@ -244,21 +257,38 @@ function ProductCard({ product, featured }: { product: any; featured?: boolean }
           ⭐ Featured
         </span>
       )}
-      <h3 className="font-bold text-lg mb-2">{product.name}</h3>
-      <p className="text-gray-600 text-sm mb-2 capitalize">
-        {product.category?.replace('-', ' ')}
+      <h3 className="font-bold text-lg mb-2 line-clamp-2">{post.title}</h3>
+      <p className="text-gray-600 text-sm mb-2 line-clamp-3">
+        {post.excerpt}
       </p>
-      <p className="text-2xl font-bold text-blue-600 mb-2">
-        ${product.price?.toFixed(2)}
-      </p>
-      <div className="flex items-center justify-between text-sm">
-        <span className={product.inStock ? 'text-green-600' : 'text-red-600'}>
-          {product.inStock ? '✅ In Stock' : '❌ Out of Stock'}
+      <div className="flex items-center gap-2 text-xs text-gray-500 mb-2">
+        <span className="capitalize">{post.category?.replace('-', ' ')}</span>
+        <span>•</span>
+        <span>{post.author}</span>
+      </div>
+      {post.readTime && (
+        <p className="text-sm text-gray-500 mb-2">📖 {post.readTime} min read</p>
+      )}
+      <div className="flex items-center justify-between text-sm mt-2">
+        <span className={post.status === 'published' ? 'text-green-600' : 'text-orange-600'}>
+          {post.status === 'published' ? '✅ Published' : '📄 Draft'}
         </span>
-        {product.inventory !== undefined && (
-          <span className="text-gray-500">Qty: {product.inventory}</span>
+        {post.publishedDate && (
+          <span className="text-gray-500">{formatDate(post.publishedDate)}</span>
         )}
       </div>
+      {post.tags && post.tags.length > 0 && (
+        <div className="flex flex-wrap gap-1 mt-2">
+          {post.tags.slice(0, 3).map((tagObj: any, idx: number) => (
+            <span
+              key={idx}
+              className="px-2 py-1 text-xs bg-gray-200 text-gray-700 rounded"
+            >
+              #{tagObj.tag}
+            </span>
+          ))}
+        </div>
+      )}
     </div>
   )
 }
@@ -278,7 +308,7 @@ function StatCard({
   const colorClasses = {
     blue: 'bg-blue-50 border-blue-200',
     green: 'bg-green-50 border-green-200',
-    red: 'bg-red-50 border-red-200',
+    orange: 'bg-orange-50 border-orange-200',
   }
 
   return (

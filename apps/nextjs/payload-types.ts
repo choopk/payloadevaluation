@@ -68,7 +68,7 @@ export interface Config {
   blocks: {};
   collections: {
     media: Media;
-    products: Product;
+    posts: Post;
     'payload-kv': PayloadKv;
     users: User;
     'payload-locked-documents': PayloadLockedDocument;
@@ -78,7 +78,7 @@ export interface Config {
   collectionsJoins: {};
   collectionsSelect: {
     media: MediaSelect<false> | MediaSelect<true>;
-    products: ProductsSelect<false> | ProductsSelect<true>;
+    posts: PostsSelect<false> | PostsSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -138,13 +138,13 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products".
+ * via the `definition` "posts".
  */
-export interface Product {
+export interface Post {
   id: number;
-  name: string;
+  title: string;
   slug: string;
-  description?: {
+  content: {
     root: {
       type: string;
       children: {
@@ -158,19 +158,24 @@ export interface Product {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
-  price: number;
-  category: 'electronics' | 'clothing' | 'books' | 'home-garden' | 'sports';
-  inStock?: boolean | null;
-  featured?: boolean | null;
-  images?:
+  };
+  excerpt: string;
+  author: string;
+  featuredImage?: (number | null) | Media;
+  category: 'technology' | 'design' | 'business' | 'lifestyle' | 'travel';
+  tags?:
     | {
-        image: number | Media;
-        alt: string;
+        tag: string;
         id?: string | null;
       }[]
     | null;
-  inventory?: number | null;
+  status: 'draft' | 'published';
+  featured?: boolean | null;
+  publishedDate?: string | null;
+  /**
+   * Estimated read time in minutes
+   */
+  readTime?: number | null;
   updatedAt: string;
   createdAt: string;
 }
@@ -227,8 +232,8 @@ export interface PayloadLockedDocument {
         value: number | Media;
       } | null)
     | ({
-        relationTo: 'products';
-        value: number | Product;
+        relationTo: 'posts';
+        value: number | Post;
       } | null)
     | ({
         relationTo: 'users';
@@ -296,24 +301,26 @@ export interface MediaSelect<T extends boolean = true> {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "products_select".
+ * via the `definition` "posts_select".
  */
-export interface ProductsSelect<T extends boolean = true> {
-  name?: T;
+export interface PostsSelect<T extends boolean = true> {
+  title?: T;
   slug?: T;
-  description?: T;
-  price?: T;
+  content?: T;
+  excerpt?: T;
+  author?: T;
+  featuredImage?: T;
   category?: T;
-  inStock?: T;
-  featured?: T;
-  images?:
+  tags?:
     | T
     | {
-        image?: T;
-        alt?: T;
+        tag?: T;
         id?: T;
       };
-  inventory?: T;
+  status?: T;
+  featured?: T;
+  publishedDate?: T;
+  readTime?: T;
   updatedAt?: T;
   createdAt?: T;
 }

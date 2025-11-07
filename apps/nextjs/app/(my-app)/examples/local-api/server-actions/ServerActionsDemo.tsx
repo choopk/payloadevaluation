@@ -2,15 +2,14 @@
 
 import { useState } from 'react'
 import {
-  createProduct,
-  updateProduct,
-  deleteProduct,
-  toggleProductStock,
-  toggleProductFeatured,
-  updateProductInventory,
+  createPost,
+  deletePost,
+  togglePostStatus,
+  togglePostFeatured,
+  updatePostReadTime,
 } from './actions'
 
-export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] }) {
+export function ServerActionsDemo({ initialPosts }: { initialPosts: any[] }) {
   const [isCreating, setIsCreating] = useState(false)
   const [actionResult, setActionResult] = useState<{
     success: boolean
@@ -18,24 +17,26 @@ export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] 
     error?: string
   } | null>(null)
 
-  const handleCreateProduct = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleCreatePost = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault()
     setIsCreating(true)
     setActionResult(null)
 
     const formData = new FormData(e.currentTarget)
     const data = {
-      name: formData.get('name') as string,
+      title: formData.get('title') as string,
       slug: formData.get('slug') as string,
-      description: formData.get('description') as string,
-      price: parseFloat(formData.get('price') as string),
+      content: formData.get('content') as string,
+      excerpt: formData.get('excerpt') as string,
+      author: formData.get('author') as string,
       category: formData.get('category') as string,
-      inStock: formData.get('inStock') === 'on',
+      status: formData.get('status') as string,
       featured: formData.get('featured') === 'on',
-      inventory: parseInt(formData.get('inventory') as string) || 0,
+      readTime: parseInt(formData.get('readTime') as string) || undefined,
+      publishedDate: formData.get('publishedDate') as string || undefined,
     }
 
-    const result = await createProduct(data)
+    const result = await createPost(data)
     setActionResult(result)
     setIsCreating(false)
 
@@ -44,26 +45,26 @@ export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] 
     }
   }
 
-  const handleToggleStock = async (id: string) => {
-    const result = await toggleProductStock(id)
+  const handleToggleStatus = async (id: string) => {
+    const result = await togglePostStatus(id)
     setActionResult(result)
   }
 
   const handleToggleFeatured = async (id: string) => {
-    const result = await toggleProductFeatured(id)
+    const result = await togglePostFeatured(id)
     setActionResult(result)
   }
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this product?')) {
+    if (!confirm('Are you sure you want to delete this post?')) {
       return
     }
-    const result = await deleteProduct(id)
+    const result = await deletePost(id)
     setActionResult(result)
   }
 
-  const handleUpdateInventory = async (id: string, inventory: number) => {
-    const result = await updateProductInventory(id, inventory)
+  const handleUpdateReadTime = async (id: string, readTime: number) => {
+    const result = await updatePostReadTime(id, readTime)
     setActionResult(result)
   }
 
@@ -85,21 +86,21 @@ export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] 
         </div>
       )}
 
-      {/* Create Product Form */}
+      {/* Create Post Form */}
       <section>
-        <h2 className="text-2xl font-bold mb-4">Create New Product</h2>
-        <form onSubmit={handleCreateProduct} className="space-y-4 max-w-2xl">
+        <h2 className="text-2xl font-bold mb-4">Create New Blog Post</h2>
+        <form onSubmit={handleCreatePost} className="space-y-4 max-w-2xl">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label className="block text-sm font-medium mb-1">
-                Product Name *
+                Post Title *
               </label>
               <input
                 type="text"
-                name="name"
+                name="title"
                 required
                 className="w-full border rounded px-3 py-2"
-                placeholder="e.g., Wireless Headphones"
+                placeholder="e.g., Getting Started with Next.js"
               />
             </div>
             <div>
@@ -109,52 +110,80 @@ export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] 
                 name="slug"
                 required
                 className="w-full border rounded px-3 py-2"
-                placeholder="e.g., wireless-headphones"
+                placeholder="e.g., getting-started-nextjs"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-sm font-medium mb-1">Description</label>
+            <label className="block text-sm font-medium mb-1">Excerpt *</label>
             <textarea
-              name="description"
+              name="excerpt"
+              required
               className="w-full border rounded px-3 py-2"
-              rows={3}
-              placeholder="Product description..."
+              rows={2}
+              placeholder="Brief description of the post..."
+            />
+          </div>
+
+          <div>
+            <label className="block text-sm font-medium mb-1">Content *</label>
+            <textarea
+              name="content"
+              required
+              className="w-full border rounded px-3 py-2"
+              rows={6}
+              placeholder="Post content..."
             />
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <div>
-              <label className="block text-sm font-medium mb-1">Price *</label>
+              <label className="block text-sm font-medium mb-1">Author *</label>
               <input
-                type="number"
-                name="price"
+                type="text"
+                name="author"
                 required
-                step="0.01"
-                min="0"
                 className="w-full border rounded px-3 py-2"
-                placeholder="99.99"
+                placeholder="e.g., John Doe"
               />
             </div>
             <div>
               <label className="block text-sm font-medium mb-1">Category *</label>
               <select name="category" required className="w-full border rounded px-3 py-2">
                 <option value="">Select category</option>
-                <option value="electronics">Electronics</option>
-                <option value="clothing">Clothing</option>
-                <option value="books">Books</option>
-                <option value="home-garden">Home & Garden</option>
-                <option value="sports">Sports</option>
+                <option value="technology">Technology</option>
+                <option value="design">Design</option>
+                <option value="business">Business</option>
+                <option value="lifestyle">Lifestyle</option>
+                <option value="travel">Travel</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1">Inventory</label>
+              <label className="block text-sm font-medium mb-1">Read Time (min)</label>
               <input
                 type="number"
-                name="inventory"
-                min="0"
-                defaultValue="0"
+                name="readTime"
+                min="1"
+                className="w-full border rounded px-3 py-2"
+                placeholder="5"
+              />
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1">Status *</label>
+              <select name="status" required defaultValue="draft" className="w-full border rounded px-3 py-2">
+                <option value="draft">Draft</option>
+                <option value="published">Published</option>
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1">Published Date</label>
+              <input
+                type="date"
+                name="publishedDate"
                 className="w-full border rounded px-3 py-2"
               />
             </div>
@@ -162,12 +191,8 @@ export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] 
 
           <div className="flex gap-4">
             <label className="flex items-center gap-2">
-              <input type="checkbox" name="inStock" defaultChecked />
-              <span className="text-sm">In Stock</span>
-            </label>
-            <label className="flex items-center gap-2">
               <input type="checkbox" name="featured" />
-              <span className="text-sm">Featured</span>
+              <span className="text-sm">Featured Post</span>
             </label>
           </div>
 
@@ -176,30 +201,30 @@ export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] 
             disabled={isCreating}
             className="bg-blue-600 text-white px-6 py-2 rounded hover:bg-blue-700 disabled:bg-gray-400"
           >
-            {isCreating ? 'Creating...' : 'Create Product'}
+            {isCreating ? 'Creating...' : 'Create Post'}
           </button>
         </form>
       </section>
 
-      {/* Products List */}
+      {/* Posts List */}
       <section>
-        <h2 className="text-2xl font-bold mb-4">Manage Products</h2>
-        {initialProducts.length === 0 ? (
+        <h2 className="text-2xl font-bold mb-4">Manage Blog Posts</h2>
+        {initialPosts.length === 0 ? (
           <div className="text-center py-12 bg-gray-50 rounded">
             <p className="text-gray-500 mb-4">
-              No products found. Create your first product above!
+              No posts found. Create your first blog post above!
             </p>
           </div>
         ) : (
           <div className="space-y-4">
-            {initialProducts.map((product) => (
-              <ProductCard
-                key={product.id}
-                product={product}
-                onToggleStock={handleToggleStock}
+            {initialPosts.map((post) => (
+              <PostCard
+                key={post.id}
+                post={post}
+                onToggleStatus={handleToggleStatus}
                 onToggleFeatured={handleToggleFeatured}
                 onDelete={handleDelete}
-                onUpdateInventory={handleUpdateInventory}
+                onUpdateReadTime={handleUpdateReadTime}
               />
             ))}
           </div>
@@ -209,26 +234,35 @@ export function ServerActionsDemo({ initialProducts }: { initialProducts: any[] 
   )
 }
 
-function ProductCard({
-  product,
-  onToggleStock,
+function PostCard({
+  post,
+  onToggleStatus,
   onToggleFeatured,
   onDelete,
-  onUpdateInventory,
+  onUpdateReadTime,
 }: {
-  product: any
-  onToggleStock: (id: string) => void
+  post: any
+  onToggleStatus: (id: string) => void
   onToggleFeatured: (id: string) => void
   onDelete: (id: string) => void
-  onUpdateInventory: (id: string, inventory: number) => void
+  onUpdateReadTime: (id: string, readTime: number) => void
 }) {
-  const [inventory, setInventory] = useState(product.inventory || 0)
+  const [readTime, setReadTime] = useState(post.readTime || 1)
   const [isUpdating, setIsUpdating] = useState(false)
 
-  const handleInventoryUpdate = async () => {
+  const handleReadTimeUpdate = async () => {
     setIsUpdating(true)
-    await onUpdateInventory(product.id, inventory)
+    await onUpdateReadTime(post.id, readTime)
     setIsUpdating(false)
+  }
+
+  const formatDate = (dateString: string) => {
+    if (!dateString) return 'No date'
+    return new Date(dateString).toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+    })
   }
 
   return (
@@ -236,35 +270,44 @@ function ProductCard({
       <div className="flex items-start justify-between">
         <div className="flex-1">
           <div className="flex items-center gap-2 mb-2">
-            <h3 className="font-bold text-lg">{product.name}</h3>
-            {product.featured && (
+            <h3 className="font-bold text-lg">{post.title}</h3>
+            {post.featured && (
               <span className="px-2 py-1 text-xs bg-yellow-400 text-black rounded">
                 ⭐ Featured
               </span>
             )}
-          </div>
-          <p className="text-gray-600 text-sm mb-2 capitalize">
-            {product.category?.replace('-', ' ')}
-          </p>
-          <p className="text-2xl font-bold text-blue-600 mb-2">
-            ${product.price?.toFixed(2)}
-          </p>
-          <div className="flex items-center gap-4">
-            <span className={product.inStock ? 'text-green-600' : 'text-red-600'}>
-              {product.inStock ? '✅ In Stock' : '❌ Out of Stock'}
+            <span className={`px-2 py-1 text-xs rounded ${
+              post.status === 'published'
+                ? 'bg-green-100 text-green-700'
+                : 'bg-orange-100 text-orange-700'
+            }`}>
+              {post.status}
             </span>
+          </div>
+          <p className="text-gray-600 text-sm mb-2 line-clamp-2">
+            {post.excerpt}
+          </p>
+          <div className="flex items-center gap-4 text-sm text-gray-500 mb-2">
+            <span>👤 {post.author}</span>
+            <span className="capitalize">{post.category?.replace('-', ' ')}</span>
+            {post.publishedDate && (
+              <span>📅 {formatDate(post.publishedDate)}</span>
+            )}
+          </div>
+          <div className="flex items-center gap-4">
             <div className="flex items-center gap-2">
-              <label className="text-sm text-gray-600">Inventory:</label>
+              <label className="text-sm text-gray-600">Read Time:</label>
               <input
                 type="number"
-                value={inventory}
-                onChange={(e) => setInventory(parseInt(e.target.value) || 0)}
-                className="w-20 border rounded px-2 py-1 text-sm"
-                min="0"
+                value={readTime}
+                onChange={(e) => setReadTime(parseInt(e.target.value) || 1)}
+                className="w-16 border rounded px-2 py-1 text-sm"
+                min="1"
               />
+              <span className="text-sm text-gray-600">min</span>
               <button
-                onClick={handleInventoryUpdate}
-                disabled={isUpdating || inventory === product.inventory}
+                onClick={handleReadTimeUpdate}
+                disabled={isUpdating || readTime === post.readTime}
                 className="text-sm bg-gray-600 text-white px-3 py-1 rounded hover:bg-gray-700 disabled:bg-gray-300"
               >
                 {isUpdating ? 'Updating...' : 'Update'}
@@ -274,19 +317,19 @@ function ProductCard({
         </div>
         <div className="flex flex-col gap-2 ml-4">
           <button
-            onClick={() => onToggleStock(product.id)}
-            className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700"
+            onClick={() => onToggleStatus(post.id)}
+            className="text-sm bg-blue-600 text-white px-3 py-1 rounded hover:bg-blue-700 whitespace-nowrap"
           >
-            Toggle Stock
+            {post.status === 'published' ? 'Unpublish' : 'Publish'}
           </button>
           <button
-            onClick={() => onToggleFeatured(product.id)}
-            className="text-sm bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700"
+            onClick={() => onToggleFeatured(post.id)}
+            className="text-sm bg-yellow-600 text-white px-3 py-1 rounded hover:bg-yellow-700 whitespace-nowrap"
           >
-            Toggle Featured
+            {post.featured ? 'Unfeature' : 'Feature'}
           </button>
           <button
-            onClick={() => onDelete(product.id)}
+            onClick={() => onDelete(post.id)}
             className="text-sm bg-red-600 text-white px-3 py-1 rounded hover:bg-red-700"
           >
             Delete

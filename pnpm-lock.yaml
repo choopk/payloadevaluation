@@ -77,6 +77,28 @@ importers:
         version: 5.9.3
 
   apps/sveltekit:
+    dependencies:
+      '@payloadcms/db-postgres':
+        specifier: ^3.62.1
+        version: 3.62.1(payload@3.62.1(graphql@16.12.0)(typescript@5.9.3))
+      '@payloadcms/next':
+        specifier: ^3.62.1
+        version: 3.62.1(@types/react@19.2.2)(graphql@16.12.0)(monaco-editor@0.54.0)(next@16.0.1(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.77.4))(payload@3.62.1(graphql@16.12.0)(typescript@5.9.3))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)
+      '@payloadcms/richtext-lexical':
+        specifier: ^3.62.1
+        version: 3.62.1(@faceless-ui/modal@3.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@faceless-ui/scroll-info@2.0.0(react-dom@19.2.0(react@19.2.0))(react@19.2.0))(@payloadcms/next@3.62.1(@types/react@19.2.2)(graphql@16.12.0)(monaco-editor@0.54.0)(next@16.0.1(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.77.4))(payload@3.62.1(graphql@16.12.0)(typescript@5.9.3))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3))(@types/react@19.2.2)(monaco-editor@0.54.0)(next@16.0.1(babel-plugin-react-compiler@1.0.0)(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(sass@1.77.4))(payload@3.62.1(graphql@16.12.0)(typescript@5.9.3))(react-dom@19.2.0(react@19.2.0))(react@19.2.0)(typescript@5.9.3)(yjs@13.6.27)
+      cross-env:
+        specifier: ^7.0.3
+        version: 7.0.3
+      graphql:
+        specifier: ^16.12.0
+        version: 16.12.0
+      payload:
+        specifier: ^3.62.1
+        version: 3.62.1(graphql@16.12.0)(typescript@5.9.3)
+      sharp:
+        specifier: ^0.34.4
+        version: 0.34.4
     devDependencies:
       '@sveltejs/adapter-auto':
         specifier: ^7.0.0
@@ -2671,6 +2693,11 @@ packages:
   cross-env@10.1.0:
     resolution: {integrity: sha512-GsYosgnACZTADcmEyJctkJIoqAhHjttw7RsFrVoJNXbsWWqaq6Ym+7kZjq6mS45O0jij6vtiReppKQEtqWy6Dw==}
     engines: {node: '>=20'}
+    hasBin: true
+
+  cross-env@7.0.3:
+    resolution: {integrity: sha512-+/HKd6EgcQCJGh2PSjZuUitQBQynKor4wrFbRg4DtAgS1aWO+gU52xpH7M9ScGgXSYmAVS9bIJ8EzuaGw0oNAw==}
+    engines: {node: '>=10.14', npm: '>=6', yarn: '>=1'}
     hasBin: true
 
   cross-spawn@7.0.6:
@@ -8699,6 +8726,10 @@ snapshots:
   cross-env@10.1.0:
     dependencies:
       '@epic-web/invariant': 1.0.0
+      cross-spawn: 7.0.6
+
+  cross-env@7.0.3:
+    dependencies:
       cross-spawn: 7.0.6
 
   cross-spawn@7.0.6:

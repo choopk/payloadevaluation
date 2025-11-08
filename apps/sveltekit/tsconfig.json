@@ -1,6 +1,7 @@
 {
 	"extends": "./.svelte-kit/tsconfig.json",
 	"compilerOptions": {
+		"target": "ES2017",
 		"allowJs": true,
 		"checkJs": true,
 		"esModuleInterop": true,
@@ -10,8 +11,15 @@
 		"sourceMap": true,
 		"strict": true,
 		"moduleResolution": "bundler",
-		"isolatedModules": true
-	}
+		"isolatedModules": true,
+		"allowImportingTsExtensions": true
+	},
+	"include": [
+		"**/*.ts",
+		"**/*.js",
+		"**/*.svelte",
+		"**/*.mts"
+	]
 	// Path aliases are handled by https://svelte.dev/docs/kit/configuration#alias
 	// except $lib which is handled by https://svelte.dev/docs/kit/configuration#files
 	//
@@ -20,4 +28,9 @@
 	//
 	// Note: Cannot extend @repo/typescript-config due to svelte-check limitations
 	// Config is kept consistent with shared standards manually
+	//
+	// Payload CMS configuration:
+	// - target: ES2017 (required by Payload)
+	// - @payload-config path alias (set in svelte.config.js alias)
+	// - Include **/*.mts files for ES module TypeScript files
 }
